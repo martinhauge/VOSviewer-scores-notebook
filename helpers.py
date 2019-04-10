@@ -1,4 +1,5 @@
 import pandas as pd
+import datetime
 import re
 import os
 import csv
@@ -101,41 +102,67 @@ def scores_file(scores, val, output_path):
     if os.path.exists(output_name):
         raise Exception('File already exists. Change OUTPUT_NAME and try again.')
     scores.to_csv(path_or_buf=output_name, sep=sep_val, index=False)
-    
-    return 'Scores file created.'
 
 def corpus_file(df, base, output_path):
     print('Creating corpus file...')
     # Setup output values
     sep_val = '\t'
     output_name = '{}_corpus.txt'.format(output_path)
+
+    # Get N/A data for summary and clean output
+    abstract_na = df[db[base]['ab']].isna().sum()
     df[db[base]['ab']] = df[db[base]['ab']].fillna('-')
     corpus = pd.DataFrame(df[db[base]['ti']] + ' ' + df[db[base]['ab']])
     if os.path.exists(output_name):
         raise Exception('File already exists. Change OUTPUT_NAME and try again.\nNote: corpus files can be re-used with different scores files from the same data set.')
     corpus.to_csv(path_or_buf=output_name, sep=sep_val, index=False, header=False)
-    
-    return 'Corpus file created.'
+
+    return abstract_na
 
 def check_output(output_path):
     if not os.path.exists(output_path):
         print('Output directory not found. Creating path...')
         os.makedirs(output_path)
 
+def summary(scores_df, time_elapsed, abstract_na):
+    print('\n*** SUMMARY *** \n\
+Number of scores values: {}\n\
+Number of references: {}\n\
+Number of abstracts N/A: {}\n\
+Time elapsed: {}'.format(len(scores_df.columns), len(scores_df), abstract_na, time_elapsed))
+
 def generate_files(user_input, output_name, path, val, base, all_files=False, skip=False):
 
+    # Set timer for summary()
+    start_time = datetime.datetime.now()
+    # Check user variables
     check_db(base, val)
+    check_output(path)
+
+    # Setup
     value = db[base][val]
     output_path = os.path.join(path, output_name)
-    check_output(path)
+    abstract_na = 'N/A'
+    
     # Check input and generate DataFrame
     df = create_df(get_input(user_input, all_files), base, value)
+
+    # Reset timer if the user has manually selected which files to include
+    if all_files:
+        start_time = datetime.datetime.now()
 
     scores = format_header(scores_df(df, value))
 
     scores_file(scores, value, output_path)
 
     if not skip:
-        corpus_file(df, base, output_path)
+        abstract_na = corpus_file(df, base, output_path)
 
     print('File creation successful.')
+
+    # Calculate time elapsed.
+    end_time = datetime.datetime.now()
+    time_elapsed = end_time - start_time
+
+    # Generate summary of file creation
+    summary(scores, time_elapsed, abstract_na)
