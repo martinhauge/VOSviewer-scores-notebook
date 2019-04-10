@@ -9,10 +9,10 @@ def check_db(base, val):
 
     # Check validity of base and scores values
     if not base in db.keys():
-        raise ValueError("Citation database not recognised. Supported values are 'wos' (Web of Science) and 'scopus' (Scopus).")
+        raise KeyError("Citation database not recognised. Supported values are 'wos' (Web of Science) and 'scopus' (Scopus).")
     # Check validity of base and scores values
     if not val in db[base].keys():
-        raise ValueError("Scores value not recognised. Supported values are 'so' (source), 'pu' (publisher) and 'py' (year).")
+        raise KeyError("Scores value not recognised. Supported values are 'so' (source), 'pu' (publisher) and 'py' (year).")
 
 def get_input(user_input, all_files):
 
