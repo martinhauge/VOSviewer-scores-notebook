@@ -5,9 +5,17 @@ import csv
 from reftypes import db
 
 
+def check_db(base, val):
+
+    # Check validity of base and scores values
+    if not base in db.keys():
+        raise ValueError("Citation database not recognised. Supported values are 'wos' (Web of Science) and 'scopus' (Scopus).")
+    # Check validity of base and scores values
+    if not val in db[base].keys():
+        raise ValueError("Scores value not recognised. Supported values are 'so' (source), 'pu' (publisher) and 'py' (year).")
 
 def get_input(user_input, all_files):
-    
+
     # Check if USER_INPUT is a valid path
     if not os.path.exists(user_input):
         raise FileNotFoundError('Input path not found. Please check the USER_INPUT variable.')
@@ -116,6 +124,7 @@ def check_output(output_path):
 
 def generate_files(user_input, output_name, path, val, base, all_files=False, skip=False):
 
+    check_db(base, val)
     value = db[base][val]
     output_path = os.path.join(path, output_name)
     check_output(path)
