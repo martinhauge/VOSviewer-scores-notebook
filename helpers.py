@@ -125,11 +125,8 @@ def check_output(output_path):
         os.makedirs(output_path)
 
 def summary(scores_df, time_elapsed, abstract_na):
-    print('\n*** SUMMARY *** \n\
-Number of scores values: {}\n\
-Number of references: {}\n\
-Number of abstracts N/A: {}\n\
-Time elapsed: {}'.format(len(scores_df.columns), len(scores_df), abstract_na, time_elapsed))
+    print(  """\n*** SUMMARY *** \nNumber of scores values: {}\nNumber of references: {}\nNumber of abstracts N/A: {}\nTime elapsed: {}"""\
+        .format(len(scores_df.columns), len(scores_df), abstract_na, time_elapsed))
 
 def generate_files(user_input, output_name, path, val, base, all_files=False, skip=False):
 
