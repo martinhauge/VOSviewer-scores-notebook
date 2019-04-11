@@ -24,3 +24,6 @@ For detailed information and options on file formats and file encodings consult 
 The programme outputs a scores file and optionally a corpus file.
 
 The corpus and scores files can be loaded into VOSviewer by creating a map based on text data and reading data from VOSviewer files.
+
+#### Requirements
+The programme is created with and for Python 3.7 and depends on the pandas library as well as a number of standard libraries.
