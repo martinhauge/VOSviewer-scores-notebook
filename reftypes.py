@@ -1,9 +1,11 @@
 import csv
 
+# Currently supported databases are Web of Science and Scopus
+# The 'db' dictionary allows for additional scores values as well as adjustment of file encodings etc.
 db = {
     'wos': {
             'sep': '\t',
-            'enc': 'utf_16_le',
+            'enc': 'utf_16_le', # Change encoding to 'utf_8' for Win UTF-8 format
             'quote': csv.QUOTE_NONE,
             'ti': 'TI',
             'ab': 'AB',
@@ -21,6 +23,7 @@ db = {
             'py': 'Year',
             'pu': 'Publisher'
             },
+    # ProQuest is not yet supported. Requires implementation of Excel files support.
     'proquest_n_a': {
             'sep': '\t',
             'enc': None,
