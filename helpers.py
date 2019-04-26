@@ -74,11 +74,11 @@ def scores_df(df, val):
     values = set([str(i).lower() for i in values])
     
     # Create DataFrame with a binary table of scores
-    scores = pd.DataFrame(columns=values, index=val_list.index).fillna('0')
+    scores = pd.DataFrame(columns=values, index=val_list.index).fillna(0)
     
     # Populate each row of the binary table
     for i, val in enumerate(val_list):
-        scores[str(val).lower()][i] = '1'
+        scores[str(val).lower()][i] = 1
     
     return scores
 
@@ -145,7 +145,7 @@ def generate_files(user_input, output_name, path, val, base, all_files=False, sk
     df = create_df(get_input(user_input, all_files), base, value)
 
     # Reset timer if the user has manually selected which files to include
-    if all_files:
+    if not all_files:
         start_time = datetime.datetime.now()
 
     scores = format_header(scores_df(df, value))
