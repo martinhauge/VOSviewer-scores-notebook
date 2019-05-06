@@ -92,7 +92,7 @@ def format_header(scores):
     
     return scores
 
-def scores_file(scores, val, output_path):
+def scores_file(scores, val, output_path, debugging):
     print('Creating scores file...')
     # Setup output values
     val = val.replace(' ', '_')
@@ -101,9 +101,10 @@ def scores_file(scores, val, output_path):
     output_name = '{}_{}_scores.txt'.format(output_path, val)
     if os.path.exists(output_name):
         raise Exception('File already exists. Change OUTPUT_NAME and try again.')
-    scores.to_csv(path_or_buf=output_name, sep=sep_val, index=False)
+    if not debugging:
+        scores.to_csv(path_or_buf=output_name, sep=sep_val, index=False)
 
-def corpus_file(df, base, output_path):
+def corpus_file(df, base, output_path, debugging):
     print('Creating corpus file...')
     # Setup output values
     sep_val = '\t'
@@ -115,9 +116,11 @@ def corpus_file(df, base, output_path):
     corpus = pd.DataFrame(df[db[base]['ti']] + ' ' + df[db[base]['ab']])
     if os.path.exists(output_name):
         raise Exception('File already exists. Change OUTPUT_NAME and try again.\nNote: corpus files can be re-used with different scores files from the same data set.')
-    corpus.to_csv(path_or_buf=output_name, sep=sep_val, index=False, header=False)
+    if not debugging:
+        corpus.to_csv(path_or_buf=output_name, sep=sep_val, index=False, header=False)
 
-    return abstract_na
+    # Return number of missing abstracts for summary()
+    return int(abstract_na)
 
 def check_output(output_path):
     if not os.path.exists(output_path):
@@ -125,10 +128,32 @@ def check_output(output_path):
         os.makedirs(output_path)
 
 def summary(scores_df, time_elapsed, abstract_na):
-    print(  """\n*** SUMMARY *** \nNumber of scores values: {}\nNumber of references: {}\nAbstracts not available: {} ({:.2%})\nTime elapsed: {}"""\
-        .format(len(scores_df.columns), len(scores_df), abstract_na, (abstract_na / len(scores_df)), time_elapsed))
+    if type(abstract_na) == int:
+        abstract_pct = '{:.2%}'.format(abstract_na / len(scores_df))
+    else:
+        abstract_pct = 'N/A'
+    print(  """\n*** SUMMARY *** \nNumber of scores values: {}\nNumber of references: {}\nAbstracts not available: {} ({})\nTime elapsed: {}"""\
+            .format(len(scores_df.columns), len(scores_df), abstract_na, abstract_pct, time_elapsed))
 
-def generate_files(user_input, output_name, path, val, base, all_files=False, skip=False):
+### W.I.P. ###
+def bucketise(y_series, interval):
+    # Define the range of the buckets
+    y_min = y_series.min()
+    y_max = y_series.max()
+
+    # Generate left-inclusiive list of buckets adjusted for first and last year
+    y_list = [y for y in range(y_min - interval, y_max + interval + 1) if y % interval == 0]
+    buckets = pd.cut(y_series, y_list, right=False)
+
+    # TODO: Adjust right edge
+
+    # Format output
+    buckets = buckets.astype(str).str.strip('[)')
+    buckets = buckets.str.replace(', ', '-')
+
+    return buckets
+
+def generate_files(user_input, output_name, path, val, base, all_files=False, skip=False, buckets=False, interval=5, debugging=False):
 
     # Set timer for summary()
     start_time = datetime.datetime.now()
@@ -148,12 +173,22 @@ def generate_files(user_input, output_name, path, val, base, all_files=False, sk
     if not all_files:
         start_time = datetime.datetime.now()
 
+    if buckets:
+        # Check input bucket suitability
+        if val == 'py':
+            # Call bucketise() and assign return value to DataFrame
+            years = df[value]
+            value = 'buckets'
+            df[value] = bucketise(years, interval)
+        else:
+            raise Exception('Bucketising only works for publication year ("py") - Please check VAL and BUCKETS.')
+    
     scores = format_header(scores_df(df, value))
 
-    scores_file(scores, value, output_path)
+    scores_file(scores, value, output_path, debugging)
 
     if not skip:
-        abstract_na = corpus_file(df, base, output_path)
+        abstract_na = corpus_file(df, base, output_path, debugging)
 
     print('File creation successful.')
 
