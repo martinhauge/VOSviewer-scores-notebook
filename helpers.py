@@ -87,6 +87,8 @@ def format_header(scores):
     # Remove illegal characters from column names with regular expression:
     scores.columns = [re.sub('[\[\]<>_]', '', col) for col in scores.columns]
     
+    scores = scores.sort_index(axis=1)
+    
     # Convert to VOSviewer scores header format:
     scores.columns = ['score<{}>'.format(col) for col in scores.columns]
     
