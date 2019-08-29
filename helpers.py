@@ -59,9 +59,15 @@ def create_df(files, base, val):
     # Create empty DataFrame and append each file
     df = pd.DataFrame()
     
-    for f in files:
-        add_file = pd.read_csv(f, sep=separator, encoding=code, index_col=False, usecols=[title, abstract, val], quoting=quote)
-        df = df.append(add_file)
+    # Special case for ProQuest XLS-format
+    if base == 'proquest':
+        for f in files:
+            add_file = pd.read_excel(f, index_col=False, usecols=[title, abstract, val])
+            df = df.append(add_file)
+    else:
+        for f in files:
+            add_file = pd.read_csv(f, sep=separator, encoding=code, index_col=False, usecols=[title, abstract, val], quoting=quote)
+            df = df.append(add_file)
     return df
 
 def scores_df(df, val):

@@ -5,6 +5,7 @@ Generate binary tables with scores for [VOSviewer](http://www.vosviewer.com/).
 #### Supported citation bases:
 - Web of Science
 - Scopus
+- Proquest
 
 #### Supported values:
 - Source ('so')
@@ -15,6 +16,7 @@ Generate binary tables with scores for [VOSviewer](http://www.vosviewer.com/).
 The programme can handle any number of input files from the same search. The file format differs depending on the citation base. When exporting references choose the following settings:
 - Web of Science: Tab-delimited (Win)
 - Scopus: CSV Excel
+- Proquest: XLS
 
 Remember to include title, abstract and the desired scores value (default: source) in the export.
 

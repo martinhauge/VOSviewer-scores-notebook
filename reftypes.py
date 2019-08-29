@@ -23,8 +23,7 @@ db = {
             'py': 'Year',
             'pu': 'Publisher'
             },
-    # ProQuest is not yet supported. Requires implementation of Excel files support.
-    'proquest_n_a': {
+    'proquest': {
             'sep': '\t',
             'enc': None,
             'quote': csv.QUOTE_ALL,
