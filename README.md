@@ -18,6 +18,8 @@ The programme can handle any number of input files from the same search. The fil
 - Scopus: CSV Excel
 - Proquest: XLS
 
+The input can also be RIS-format.
+
 Remember to include title, abstract and the desired scores value (default: source) in the export.
 
 For detailed information and options on file formats and file encodings consult `reftypes.py`.

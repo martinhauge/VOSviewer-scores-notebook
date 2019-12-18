@@ -32,5 +32,16 @@ db = {
             'so': 'pubtitle',
             'py': 'year',
             'pu': 'publisher'
+            },
+    'ris': {
+            'sep': None,
+            'enc': None,
+            'quote': csv.QUOTE_ALL,
+            'ti': 'title',
+            'ab': 'abstract',
+            'so': 'source',
+            'py': 'year',
+            'pu': None,
+            'ty': 'type'
             }
     }

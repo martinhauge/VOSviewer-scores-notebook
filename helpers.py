@@ -3,6 +3,7 @@ import datetime
 import re
 import os
 import csv
+from ris import ris_df
 from reftypes import db
 
 
@@ -58,7 +59,12 @@ def create_df(files, base, val):
     
     # Create empty DataFrame and append each file
     df = pd.DataFrame()
-    
+
+    # Special case for RIS-format
+    if base == 'ris':
+        for f in files:
+            df = df.append(ris_df(f))
+        return df
     # Special case for ProQuest XLS-format
     if base == 'proquest':
         for f in files:
