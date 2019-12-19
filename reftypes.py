@@ -1,11 +1,11 @@
 import csv
 
-# Currently supported databases are Web of Science and Scopus
+# Currently supported databases are Web of Science, Scopus and Proquest as well as RIS files.
 # The 'db' dictionary allows for additional scores values as well as adjustment of file encodings etc.
 db = {
     'wos': {
             'sep': '\t',
-            'enc': 'utf_16_le', # Change encoding to 'utf_8' for Win UTF-8 format
+            'enc': 'utf-16-le', # Change encoding to 'utf-8' for Win UTF-8 format
             'quote': csv.QUOTE_NONE,
             'ti': 'TI',
             'ab': 'AB',
@@ -35,7 +35,7 @@ db = {
             },
     'ris': {
             'sep': None,
-            'enc': None,
+            'enc': 'utf-8-sig',
             'quote': csv.QUOTE_ALL,
             'ti': 'title',
             'ab': 'abstract',

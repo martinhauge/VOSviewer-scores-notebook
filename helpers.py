@@ -30,16 +30,23 @@ def get_input(user_input, all_files):
         
         # Ask whether to include individual files - else include entire folder
         if not all_files:
+            
             select_files = []
+            
             for f in files:
                 print('Add {} to analysis? (y/n)'.format(f))
                 response = input()
+                
                 if response.lower() in ['y', 'yes']:
                     select_files.append(f)
                     print('{} added.'.format(f))
                 else:
                     print('{} not added.'.format(f))
                     continue
+            
+            if not select_files:
+                raise Exception('No files added to analysis.')
+            
             return select_files
         else:
             print('All files added to analysis.')
