@@ -3,15 +3,19 @@ import datetime
 import re
 import os
 import csv
-from ris import ris_df
+import logging
+from ris import ris_df, ris_detect
 from reftypes import db
 
+log_level = logging.DEBUG
+
+logging.basicConfig(level=log_level, format='[%(asctime)s] %(levelname)s (%(module)s): %(message)s')
 
 def check_db(base, val):
 
     # Check validity of base and scores values
     if not base in db.keys():
-        raise KeyError("Citation database not recognised. Supported values are 'wos' (Web of Science) and 'scopus' (Scopus).")
+        raise KeyError("Citation database not recognised. See reftypes.py for supported values.")
     # Check validity of base and scores values
     if not val in db[base].keys():
         raise KeyError("Scores value not recognised. Supported values are 'so' (source), 'pu' (publisher) and 'py' (year).")
@@ -174,21 +178,88 @@ def bucketise(y_series, interval):
 
     return buckets
 
-def generate_files(user_input, output_name, path, val, base, all_files=False, skip=False, buckets=False, interval=5, debugging=False):
+def detect_base(test_file):
+    # Check filename for clues.
+    if test_file.endswith('.xls'):
+        print('This looks like the format of ProQuest.')
+        return 'proquest'
+    elif test_file.endswith('.csv'):
+        print('This looks like the format of Scopus.')
+        return 'scopus'
+    elif test_file.endswith('.txt') or test_file.endswith('.ris'):
+        try:
+            logging.debug('Trying UTF-16-LE...')
+            with open(test_file, 'r', encoding='utf-16-le') as f:
+                head = next(f)
+            logging.debug(f'Beginning of file: {head[:20]}')
+            logging.debug('File read with UTF-16-LE encoding...')
+            if head.startswith('\ufeffPT'):
+                print('This looks like the format of Web of Science.')
+                return 'wos'
+            else:
+                logging.debug('Header not matched.')
+                try:
+                    logging.debug('Trying UTF-8...')
+                    with open(test_file, 'r', encoding='utf-8-sig') as f:
+                        head = next(f)
+                    logging.debug(f'Beginning of file: {head[:20]}')
+                    logging.debug('File read with UTF-8 encoding...')
+                    try:
+                        ris_detect(head)
+                        print('This looks like the format of RIS or Endnote.')
+                        return 'ris'
+                    except:
+                        pass
+                except Exception as err:
+                    logging.debug(err)
+        except Exception as err:
+            logging.debug(err)
+            try:
+                logging.debug('Trying UTF-8...')
+                with open(test_file, 'r', encoding='utf-8-sig') as f:
+                    head = next(f)
+                logging.debug(f'Beginning of file: {head[:20]}')
+                logging.debug('File read with UTF-8 encoding...')
+                try:
+                    ris_detect(head)
+                    print('This looks like the format of RIS or Endnote.')
+                    return 'ris'
+                except:
+                    pass
+            except:
+                pass
+    raise Exception('Failed to auto-detect format. Please specify in user variables.')
 
-    # Set timer for summary()
+def generate_files(user_input,
+                    output_name,
+                    path,
+                    val,
+                    base=None,
+                    all_files=False,
+                    skip=False,
+                    buckets=False,
+                    interval=5,
+                    debugging=False):
     start_time = datetime.datetime.now()
+    
     # Check user variables
-    check_db(base, val)
     check_output(path)
 
     # Setup
+    file_list = get_input(user_input, all_files)
+    
+    if not base:
+        # Attempt to detect format from input file.
+        base = detect_base(file_list[0])
+
+    check_db(base, val)
+
     value = db[base][val]
     output_path = os.path.join(path, output_name)
     abstract_na = 'N/A'
     
     # Check input and generate DataFrame
-    df = create_df(get_input(user_input, all_files), base, value)
+    df = create_df(file_list, base, value)
 
     # Reset timer if the user has manually selected which files to include
     if not all_files:

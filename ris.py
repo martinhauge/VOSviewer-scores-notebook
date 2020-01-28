@@ -1,4 +1,18 @@
 import pandas as pd
+import logging
+
+def ris_detect(raw):
+    """ Detect RIS format style. """
+    if raw.startswith('TY  -'):
+        logging.debug('RIS file format detected.')
+        return 'ris'
+    elif raw.startswith('%0'):
+        logging.debug('Endnote file format detected.')
+        return 'endnote'
+    else:
+        logging.debug('RIS format not identified.')
+        raise Exception(f'Data scheme not recognised. Please check file format.\nBeginning of file: "{raw[:20]}"')
+
 
 def ris_parse(ris_file):
     """ Read RIS file an parse rows and values to list of lists. """
@@ -6,14 +20,7 @@ def ris_parse(ris_file):
     with open(ris_file, 'r', encoding='utf-8-sig') as f:
         raw = f.read()
 
-    if raw.startswith('TY  -'):
-        print('RIS file format detected.')
-        data_scheme = 'ris'
-    elif raw.startswith('%0'):
-        print('Endnote file format detected.')
-        data_scheme = 'endnote'
-    else:
-        raise Exception(f'Data scheme not recognised. Please check file format.\nBeginning of file: {raw[:20]}')
+    data_scheme = ris_detect(raw)
 
     data = raw.strip()
 

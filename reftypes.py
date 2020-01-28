@@ -11,7 +11,8 @@ db = {
             'ab': 'AB',
             'so': 'SO',
             'py': 'PY',
-            'pu': 'PU'
+            'pu': 'PU',
+            'ty': 'DT'
             },
     'scopus': {
             'sep': ',',
@@ -21,7 +22,8 @@ db = {
             'ab': 'Abstract',
             'so': 'Source title',
             'py': 'Year',
-            'pu': 'Publisher'
+            'pu': 'Publisher',
+            'ty': 'Document Type'
             },
     'proquest': {
             'sep': '\t',
@@ -31,7 +33,8 @@ db = {
             'ab': 'Abstract',
             'so': 'pubtitle',
             'py': 'year',
-            'pu': 'publisher'
+            'pu': 'publisher',
+            'ty': 'ArticleType'
             },
     'ris': {
             'sep': None,
