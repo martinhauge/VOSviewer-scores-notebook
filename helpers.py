@@ -7,7 +7,7 @@ import logging
 from ris import ris_df, ris_detect
 from reftypes import db
 
-log_level = logging.DEBUG
+log_level = logging.WARNING
 
 logging.basicConfig(level=log_level, format='[%(asctime)s] %(levelname)s (%(module)s): %(message)s')
 
@@ -93,8 +93,7 @@ def scores_df(df, val):
     val_list.reset_index(drop=True, inplace=True)
     
     # Create list of unique values
-    values = sorted(list(val_list.unique()))
-    values = set([str(i).lower() for i in values])
+    values = set(sorted([str(i).lower() for i in val_list.unique()]))
     
     # Create DataFrame with a binary table of scores
     scores = pd.DataFrame(columns=values, index=val_list.index).fillna(0)
@@ -161,7 +160,14 @@ def summary(scores_df, time_elapsed, abstract_na):
             .format(len(scores_df.columns), len(scores_df), abstract_na, abstract_pct, time_elapsed))
 
 ### W.I.P. ###
-def bucketise(y_series, interval):
+def bucketise(y_series, interval, drop_na=False):
+    if drop_na:
+        # TODO
+        pass
+
+    else:
+        y_series = y_series.fillna(0).astype(int)
+
     # Define the range of the buckets
     y_min = y_series.min()
     y_max = y_series.max()
@@ -175,6 +181,7 @@ def bucketise(y_series, interval):
     # Format output
     buckets = buckets.astype(str).str.strip('[)')
     buckets = buckets.str.replace(', ', '-')
+    buckets = buckets.str.replace('0-.*', 'N/A')
 
     return buckets
 
@@ -242,6 +249,11 @@ def generate_files(user_input,
                     debugging=False):
     start_time = datetime.datetime.now()
     
+    if debugging:
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.debug('Debugging enabled.')
+        print('^^')
+
     # Check user variables
     check_output(path)
 
@@ -265,7 +277,7 @@ def generate_files(user_input,
     if not all_files:
         start_time = datetime.datetime.now()
 
-    if buckets:
+    if buckets and interval > 1:
         # Check input bucket suitability
         if val == 'py':
             # Call bucketise() and assign return value to DataFrame
