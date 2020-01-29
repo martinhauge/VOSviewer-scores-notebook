@@ -181,7 +181,7 @@ def bucketise(y_series, interval, drop_na=False):
     # Format output
     buckets = buckets.astype(str).str.strip('[)')
     buckets = buckets.str.replace(', ', '-')
-    buckets = buckets.str.replace('0-.*', 'N/A')
+    buckets = buckets.str.replace('^0-.*', 'N/A')
 
     return buckets
 
