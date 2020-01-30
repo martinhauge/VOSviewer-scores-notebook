@@ -43,9 +43,9 @@ def get_input(user_input, all_files):
                 
                 if response.lower() in ['y', 'yes']:
                     select_files.append(f)
-                    print('{} added.'.format(f))
+                    print('{} added.\n'.format(f))
                 else:
-                    print('{} not added.'.format(f))
+                    print('{} not added.\n'.format(f))
                     continue
             
             if not select_files:
@@ -53,7 +53,7 @@ def get_input(user_input, all_files):
             
             return select_files
         else:
-            print('All files added to analysis.')
+            print('All files added to analysis.\n')
             return files
     else:
         # Return path to file as single element list
@@ -158,6 +158,10 @@ def summary(scores_df, time_elapsed, abstract_na):
         abstract_pct = 'N/A'
     print(  """\n*** SUMMARY *** \nNumber of scores values: {}\nNumber of references: {}\nAbstracts not available: {} ({})\nTime elapsed: {}"""\
             .format(len(scores_df.columns), len(scores_df), abstract_na, abstract_pct, time_elapsed))
+    print('\nScores value distribution:')
+    for n, i in enumerate(scores_df.sum()):
+        scores_pct = '{:.2%}'.format(i / len(scores_df))
+        print(f'  {scores_df.columns[n].replace("score<", "").replace(">", "")}: {i} ({scores_pct})')
 
 ### W.I.P. ###
 def bucketise(y_series, interval, drop_na=False):
@@ -252,7 +256,6 @@ def generate_files(user_input,
     if debugging:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug('Debugging enabled.')
-        print('^^')
 
     # Check user variables
     check_output(path)
@@ -260,6 +263,16 @@ def generate_files(user_input,
     # Setup
     file_list = get_input(user_input, all_files)
     
+    if buckets and interval > 1:
+        # Check input bucket suitability
+        if not val == 'py':
+            val_input = input(f'Bucketising only works for publication year. Continue with scores value "py" instead of "{val}"? (y/n)\n')
+            if val_input.lower() == 'y' or user_input.lower() == 'yes':
+                val = 'py'
+            # Reset timer after user input.
+            if all_files:
+                start_time = datetime.datetime.now()
+
     if not base:
         # Attempt to detect format from input file.
         base = detect_base(file_list[0])
