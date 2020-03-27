@@ -1,3 +1,5 @@
+:warning: **Notice:** *This repository is no longer maintained and will be archived. Development of the project continues [here](https://github.com/martinhauge/VOSviewer-scores-web).*
+
 ## VOSviewer scores file generator
 
 Generate binary tables with scores for [VOSviewer](http://www.vosviewer.com/).
